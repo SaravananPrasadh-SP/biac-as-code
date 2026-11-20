@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "resources": [
+    {"name": "columnMaskExpressions", "op": "listColumnMaskExpressions", "drop": ["id"]},
+    {"name": "rowFilterExpressions",  "op": "listRowFilterExpressions",  "drop": ["id"]},
+    {"name": "roles", "op": "listRoles", "selectKey": "name", "drop": ["id"]},
+    {"name": "grants", "op": "listGrants", "per": "roles", "params": {"roleId": "id"},
+     "rewrite": [
+       {"field": "columnMaskExpressionId", "to": "columnMaskExpression", "from": "columnMaskExpressions", "use": "name"},
+       {"field": "rowFilterExpressionId",  "to": "rowFilterExpression",  "from": "rowFilterExpressions",  "use": "name"}],
+     "drop": ["id"]},
+    {"name": "locationGrants", "op": "listLocationGrants", "per": "roles", "params": {"roleId": "id"}, "drop": ["id"], "optional": true},
+    {"name": "columnMasks", "op": "listRoleColumnMasks", "per": "roles", "params": {"roleId": "id"},
+     "rewrite": [{"field": "expressionId", "to": "expression", "from": "columnMaskExpressions", "use": "name"}],
+     "drop": ["id"]},
+    {"name": "rowFilters", "op": "listRoleRowFilters", "per": "roles", "params": {"roleId": "id"},
+     "rewrite": [{"field": "expressionId", "to": "expression", "from": "rowFilterExpressions", "use": "name"}],
+     "drop": ["id"]},
+    {"name": "assignments", "op": "listRoleAssignments", "per": "roles", "params": {"roleId": "id"},
+     "rewrite": [{"field": "subject.roleId", "to": "subject.role", "from": "roles", "use": "name"}],
+     "drop": ["id"]}
+  ]
+}
